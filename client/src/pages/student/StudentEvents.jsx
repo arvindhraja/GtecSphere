@@ -6,7 +6,7 @@ import {
 
 import "./StudentEvents.css";
 
-const API_URL = "http://gtecsphere-backend.onrender.com/api";
+const API_URL = "https://gtecsphere-backend.onrender.com/api";
 
 const categories = [
   "All",

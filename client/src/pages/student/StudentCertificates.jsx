@@ -7,7 +7,7 @@ import {
 
 import "./StudentCertificates.css";
 
-const API_URL = "http://gtecsphere-backend.onrender.com/api/certificates";
+const API_URL = "https://gtecsphere-backend.onrender.com/api/certificates";
 
 const filters = ["All", "Issued", "Revoked"];
 

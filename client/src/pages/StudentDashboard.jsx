@@ -13,7 +13,7 @@ import StudentProfile from "./student/StudentProfile.jsx";
 import "./StudentDashboard.css";
 import GtecSphereLogo from "../components/GtecSphereLogo.jsx";
 
-const API_URL = "http://gtecsphere-backend.onrender.com/api";
+const API_URL = "https://gtecsphere-backend.onrender.com/api";
 
 
 function StudentDashboard() {

@@ -10,7 +10,7 @@ import "./CoordinatorAttendance.css";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://gtecsphere-backend.onrender.com/api";
+  "https://gtecsphere-backend.onrender.com/api";
 
 
 function CoordinatorAttendance() {
