@@ -21,37 +21,55 @@ const app = express();
 // ==========================================
 const allowedOrigins = [
     "http://localhost:5173",
+    "https://gtecsphere.netlify.app",
     process.env.CLIENT_URL
 ].filter(Boolean);
 
 
 // ==========================================
-// MIDDLEWARES
+// CORS MIDDLEWARE
 // ==========================================
 app.use(
     cors({
         origin: (origin, callback) => {
-            if (
-                !origin ||
-                allowedOrigins.includes(origin)
-            ) {
+            if (!origin || allowedOrigins.includes(origin)) {
                 return callback(null, true);
             }
+
+            console.log("Blocked by CORS:", origin);
 
             return callback(
                 new Error("Not allowed by CORS")
             );
         },
-        credentials: true
+        credentials: true,
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        ],
+        allowedHeaders: [
+            "Content-Type",
+            "Authorization"
+        ]
     })
 );
 
+
+// ==========================================
+// OTHER MIDDLEWARES
+// ==========================================
 app.use(express.json());
+
 app.use(
     express.urlencoded({
         extended: true
     })
 );
+
 app.use(cookieParser());
 
 
@@ -80,4 +98,8 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/feedback", feedbackRoutes);
 
+
+// ==========================================
+// EXPORT APP
+// ==========================================
 module.exports = app;
