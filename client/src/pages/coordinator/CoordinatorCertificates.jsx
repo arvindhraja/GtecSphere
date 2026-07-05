@@ -7,7 +7,7 @@ import {
 
 import "./CoordinatorCertificates.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "http://gtecsphere-backend.onrender.com/api";
 
 function CoordinatorCertificates() {
   const [events, setEvents] = useState([]);
