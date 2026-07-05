@@ -13,52 +13,41 @@ const {
 const protect = require("../middleware/auth");
 const authorize = require("../middleware/roleMiddleware");
 
-// ==========================================
+
 // GET ALL EVENTS
-// Public access
-// ==========================================
 router.get("/", getEvents);
 
 
-// ==========================================
 // GET SINGLE EVENT
-// Public access
-// ==========================================
 router.get("/:id", getEvent);
 
 
-// ==========================================
 // CREATE EVENT
-// Coordinator + Admin only
-// ==========================================
+// ADMIN + COORDINATOR
 router.post(
     "/",
     protect,
-    authorize("coordinator", "admin"),
+    authorize("admin", "coordinator"),
     createEvent
 );
 
 
-// ==========================================
 // UPDATE EVENT
-// Admin only
-// ==========================================
+// ADMIN + COORDINATOR
 router.put(
     "/:id",
     protect,
-    authorize("admin"),
+    authorize("admin", "coordinator"),
     updateEvent
 );
 
 
-// ==========================================
 // DELETE EVENT
-// Admin only
-// ==========================================
+// ADMIN + COORDINATOR
 router.delete(
     "/:id",
     protect,
-    authorize("admin"),
+    authorize("admin", "coordinator"),
     deleteEvent
 );
 

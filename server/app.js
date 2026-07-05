@@ -11,6 +11,7 @@ const studentRoutes = require("./routes/student.routes");
 const coordinatorRoutes = require("./routes/coordinator.routes");
 const certificateRoutes = require("./routes/certificate.routes");
 const notificationRoutes = require("./routes/notification.routes");
+const feedbackRoutes = require("./routes/feedback.routes");
 
 const app = express();
 
@@ -77,6 +78,6 @@ app.use("/api/student", studentRoutes);
 app.use("/api/coordinator", coordinatorRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/notifications", notificationRoutes);
-
+app.use("/api/feedback", feedbackRoutes);
 
 module.exports = app;
