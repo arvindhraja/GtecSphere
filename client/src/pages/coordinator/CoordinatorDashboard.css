@@ -1,0 +1,831 @@
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.coordinator-app {
+  min-height: 100vh;
+  display: flex;
+  color: #0f172a;
+  background: #f5f7fb;
+}
+
+/* ==========================================
+   SIDEBAR
+========================================== */
+
+.coordinator-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 270px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px;
+  color: white;
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(34, 211, 238, 0.14),
+      transparent 30%
+    ),
+    linear-gradient(180deg, #07111f 0%, #0c1730 100%);
+  box-shadow: 18px 0 50px rgba(15, 23, 42, 0.08);
+}
+
+.coordinator-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.coordinator-logo-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: white;
+  font-weight: 900;
+  background: linear-gradient(135deg, #22d3ee, #6366f1);
+  box-shadow: 0 10px 25px rgba(34, 211, 238, 0.18);
+}
+
+.coordinator-role-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 26px 4px 18px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.coordinator-role-badge > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(103, 232, 249, 0.1);
+}
+
+.coordinator-role-badge div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.coordinator-role-badge small {
+  color: #64748b;
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.coordinator-role-badge strong {
+  color: #e2e8f0;
+  font-size: 0.82rem;
+}
+
+.coordinator-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: none;
+}
+
+.coordinator-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.coordinator-nav button {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 13px;
+  color: #8290a8;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: left;
+  background: transparent;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.coordinator-nav button > span {
+  width: 25px;
+  color: #718096;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.coordinator-nav button:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(3px);
+}
+
+.coordinator-nav button.active {
+  color: white;
+  background: linear-gradient(
+    135deg,
+    rgba(79, 70, 229, 0.92),
+    rgba(37, 99, 235, 0.92)
+  );
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.2);
+}
+
+.coordinator-nav button.active > span {
+  color: #67e8f9;
+}
+
+.coordinator-sidebar-bottom {
+  margin-top: auto;
+  padding-top: 18px;
+}
+
+.coordinator-logout {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 15px;
+  border: 1px solid rgba(248, 113, 113, 0.1);
+  border-radius: 13px;
+  color: #f87171;
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: rgba(248, 113, 113, 0.05);
+}
+
+.coordinator-logout:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ==========================================
+   MAIN
+========================================== */
+
+.coordinator-main {
+  width: calc(100% - 270px);
+  min-height: 100vh;
+  margin-left: 270px;
+}
+
+.coordinator-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 15px 34px;
+  border-bottom: 1px solid #e8edf3;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.coordinator-topbar > div:first-child > p {
+  margin: 0 0 4px;
+  color: #6366f1;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+}
+
+.coordinator-topbar h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.coordinator-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.coordinator-notification {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+  color: #475569;
+  background: white;
+}
+
+.coordinator-notification > span {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.coordinator-profile {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.coordinator-avatar {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 13px;
+  color: white;
+  font-weight: 900;
+  background: linear-gradient(135deg, #22d3ee, #6366f1);
+}
+
+.coordinator-profile div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.coordinator-profile strong {
+  font-size: 0.78rem;
+}
+
+.coordinator-profile small {
+  color: #64748b;
+  font-size: 0.65rem;
+}
+
+.coordinator-content {
+  padding: 30px 34px 40px;
+}
+
+/* ==========================================
+   WELCOME
+========================================== */
+
+.coordinator-welcome {
+  position: relative;
+  min-height: 245px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 38px 42px;
+  border-radius: 26px;
+  color: white;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(34, 211, 238, 0.22),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #07111f 0%, #101c42 100%);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+
+.coordinator-welcome > div:first-child {
+  position: relative;
+  z-index: 2;
+  max-width: 690px;
+}
+
+.coordinator-welcome-label {
+  margin: 0 0 12px;
+  color: #67e8f9;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.coordinator-welcome h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+.coordinator-welcome > div:first-child > p:not(
+    .coordinator-welcome-label
+  ) {
+  max-width: 580px;
+  margin: 15px 0 22px;
+  color: #a9b6cc;
+  line-height: 1.7;
+}
+
+.coordinator-welcome > div:first-child > button {
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 13px;
+  color: #07111f;
+  font-size: 0.76rem;
+  font-weight: 900;
+  background: #67e8f9;
+  box-shadow: 0 12px 30px rgba(103, 232, 249, 0.18);
+}
+
+.coordinator-welcome-decoration {
+  position: absolute;
+  right: -35px;
+  width: 270px;
+  height: 270px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.coordinator-welcome-decoration::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.coordinator-welcome-decoration span {
+  color: rgba(255, 255, 255, 0.07);
+  font-size: 8rem;
+  font-weight: 900;
+}
+
+/* ==========================================
+   STATS
+========================================== */
+
+.coordinator-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.coordinator-stat-card {
+  position: relative;
+  min-height: 135px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #e5eaf1;
+  border-radius: 20px;
+  background: white;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.coordinator-stat-card:hover {
+  border-color: #c7d2fe;
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.coordinator-stat-icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 15px;
+  color: #4f46e5;
+  font-size: 1.2rem;
+  font-weight: 900;
+  background: #eef2ff;
+}
+
+.coordinator-stat-card p {
+  margin: 0 0 3px;
+  color: #64748b;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.coordinator-stat-card h3 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.coordinator-stat-card small {
+  color: #94a3b8;
+  font-size: 0.6rem;
+}
+
+.coordinator-stat-card > button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 9px;
+  color: #6366f1;
+  background: #f1f5f9;
+}
+
+/* ==========================================
+   DASHBOARD GRID
+========================================== */
+
+.coordinator-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.75fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.coordinator-panel,
+.coordinator-quick-actions,
+.coordinator-activity-panel {
+  padding: 24px;
+  border: 1px solid #e5eaf1;
+  border-radius: 22px;
+  background: white;
+}
+
+.coordinator-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.coordinator-section-heading p {
+  margin: 0 0 5px;
+  color: #6366f1;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.coordinator-section-heading h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
+}
+
+.coordinator-section-heading > button {
+  border: 0;
+  color: #6366f1;
+  font-size: 0.72rem;
+  font-weight: 900;
+  background: transparent;
+}
+
+/* ==========================================
+   EMPTY EVENT STATE
+========================================== */
+
+.coordinator-empty-state {
+  min-height: 310px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px;
+  text-align: center;
+}
+
+.coordinator-empty-state > div {
+  width: 65px;
+  height: 65px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  color: #4f46e5;
+  font-size: 1.6rem;
+  background: #eef2ff;
+}
+
+.coordinator-empty-state h3 {
+  margin: 0;
+}
+
+.coordinator-empty-state p {
+  max-width: 380px;
+  margin: 9px 0 20px;
+  color: #64748b;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.coordinator-empty-state button {
+  min-height: 43px;
+  padding: 0 17px;
+  border: 0;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.74rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+}
+
+/* ==========================================
+   QUICK ACTIONS
+========================================== */
+
+.coordinator-quick-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+.coordinator-quick-actions > button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 43px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border: 0;
+  border-bottom: 1px solid #edf0f5;
+  text-align: left;
+  background: transparent;
+}
+
+.coordinator-quick-actions > button:last-child {
+  border-bottom: 0;
+}
+
+.coordinator-quick-actions > button > span {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  color: #4f46e5;
+  font-weight: 900;
+  background: #eef2ff;
+}
+
+.coordinator-quick-actions > button > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coordinator-quick-actions strong {
+  color: #0f172a;
+  font-size: 0.76rem;
+}
+
+.coordinator-quick-actions small {
+  color: #94a3b8;
+  font-size: 0.62rem;
+}
+
+.coordinator-quick-actions b {
+  color: #94a3b8;
+  transition: transform 0.2s ease;
+}
+
+.coordinator-quick-actions > button:hover b {
+  color: #4f46e5;
+  transform: translateX(4px);
+}
+
+/* ==========================================
+   ACTIVITY
+========================================== */
+
+.coordinator-activity-panel {
+  margin-top: 18px;
+}
+
+.coordinator-empty-activity {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.coordinator-empty-activity > span {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 14px;
+  color: #6366f1;
+  background: #eef2ff;
+}
+
+.coordinator-empty-activity h3 {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.coordinator-empty-activity p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+/* ==========================================
+   TEMPORARY PAGES
+========================================== */
+
+.coordinator-page-placeholder {
+  min-height: calc(100vh - 150px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  border: 1px solid #e5eaf1;
+  border-radius: 24px;
+  text-align: center;
+  background: white;
+}
+
+.coordinator-page-placeholder > div {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border-radius: 22px;
+  color: #4f46e5;
+  font-size: 1.8rem;
+  background: #eef2ff;
+}
+
+.coordinator-page-placeholder h2 {
+  margin: 0;
+}
+
+.coordinator-page-placeholder p {
+  margin: 9px 0 0;
+  color: #64748b;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1200px) {
+  .coordinator-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .coordinator-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 760px) {
+  .coordinator-sidebar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 76px;
+    display: block;
+    padding: 8px 10px;
+  }
+
+  .coordinator-logo,
+  .coordinator-role-badge,
+  .coordinator-sidebar-bottom {
+    display: none;
+  }
+
+  .coordinator-nav {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+  }
+
+  .coordinator-nav button {
+    min-width: 76px;
+    min-height: 58px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px;
+    font-size: 0.55rem;
+  }
+
+  .coordinator-nav button:hover {
+    transform: none;
+  }
+
+  .coordinator-main {
+    width: 100%;
+    margin-left: 0;
+    padding-bottom: 76px;
+  }
+
+  .coordinator-topbar {
+    min-height: 76px;
+    padding: 12px 18px;
+  }
+
+  .coordinator-topbar h2 {
+    font-size: 1.1rem;
+  }
+
+  .coordinator-profile div {
+    display: none;
+  }
+
+  .coordinator-notification {
+    width: 40px;
+    height: 40px;
+  }
+
+  .coordinator-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .coordinator-content {
+    padding: 20px 16px 28px;
+  }
+
+  .coordinator-welcome {
+    min-height: 270px;
+    padding: 28px 24px;
+    border-radius: 22px;
+  }
+
+  .coordinator-welcome h1 {
+    max-width: 310px;
+    font-size: 2.15rem;
+  }
+
+  .coordinator-welcome > div:first-child > p:not(
+      .coordinator-welcome-label
+    ) {
+    max-width: 280px;
+    font-size: 0.82rem;
+  }
+
+  .coordinator-welcome-decoration {
+    right: -150px;
+  }
+
+  .coordinator-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .coordinator-stat-card {
+    min-height: 110px;
+  }
+
+  .coordinator-panel,
+  .coordinator-quick-actions,
+  .coordinator-activity-panel {
+    padding: 20px;
+  }
+
+  .coordinator-empty-state {
+    min-height: 280px;
+    padding: 25px 10px;
+  }
+}

@@ -1,0 +1,296 @@
+/* ==========================================
+   GTECSPHERE GLOBAL LOGO
+========================================== */
+
+.gtec-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+}
+
+.gtec-logo-mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.gtec-logo-core {
+  position: relative;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 13px;
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed 0%,
+      #4f46e5 48%,
+      #0891b2 100%
+    );
+  box-shadow:
+    0 10px 24px rgba(79, 70, 229, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transform: rotate(-5deg);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.gtec-logo-core::before {
+  content: "";
+  position: absolute;
+  top: -45%;
+  left: -80%;
+  width: 55%;
+  height: 190%;
+  background: rgba(255, 255, 255, 0.22);
+  transform: rotate(25deg);
+  animation: gtecLogoShine 4s ease-in-out infinite;
+}
+
+.gtec-code-symbol {
+  position: relative;
+  z-index: 2;
+  font-size: 0.68rem;
+  font-weight: 1000;
+  letter-spacing: -1px;
+  transform: rotate(5deg);
+}
+
+.gtec-orbit {
+  position: absolute;
+  z-index: 1;
+  border: 1px solid rgba(99, 102, 241, 0.32);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.gtec-orbit-one {
+  width: 47px;
+  height: 22px;
+  transform: rotate(35deg);
+  animation: gtecOrbitOne 7s linear infinite;
+}
+
+.gtec-orbit-two {
+  width: 22px;
+  height: 47px;
+  transform: rotate(35deg);
+  animation: gtecOrbitTwo 8s linear infinite reverse;
+}
+
+.gtec-orbit-dot {
+  position: absolute;
+  z-index: 4;
+  top: 3px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.9);
+  animation: gtecDotPulse 2s ease-in-out infinite;
+}
+
+.gtec-brand-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gtec-brand-copy strong {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.gtec-brand-copy strong span {
+  color: #6366f1;
+}
+
+.gtec-brand-copy small {
+  font-size: 0.5rem;
+  font-weight: 850;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.65;
+}
+
+
+/* ==========================================
+   VARIANTS
+========================================== */
+
+.gtec-brand-light .gtec-brand-copy strong {
+  color: #0f172a;
+}
+
+.gtec-brand-dark .gtec-brand-copy strong {
+  color: #ffffff;
+}
+
+.gtec-brand-dark .gtec-brand-copy strong span {
+  color: #a5b4fc;
+}
+
+.gtec-brand-dark .gtec-brand-copy small {
+  color: #cbd5e1;
+}
+
+
+/* ==========================================
+   SIZES
+========================================== */
+
+.gtec-brand-small {
+  gap: 9px;
+}
+
+.gtec-brand-small .gtec-logo-mark {
+  width: 40px;
+  height: 40px;
+}
+
+.gtec-brand-small .gtec-logo-core {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+
+.gtec-brand-small .gtec-orbit-one {
+  width: 39px;
+  height: 18px;
+}
+
+.gtec-brand-small .gtec-orbit-two {
+  width: 18px;
+  height: 39px;
+}
+
+.gtec-brand-small .gtec-code-symbol {
+  font-size: 0.56rem;
+}
+
+.gtec-brand-small .gtec-brand-copy strong {
+  font-size: 0.9rem;
+}
+
+
+.gtec-brand-large {
+  gap: 15px;
+}
+
+.gtec-brand-large .gtec-logo-mark {
+  width: 62px;
+  height: 62px;
+}
+
+.gtec-brand-large .gtec-logo-core {
+  width: 49px;
+  height: 49px;
+  border-radius: 16px;
+}
+
+.gtec-brand-large .gtec-orbit-one {
+  width: 60px;
+  height: 28px;
+}
+
+.gtec-brand-large .gtec-orbit-two {
+  width: 28px;
+  height: 60px;
+}
+
+.gtec-brand-large .gtec-code-symbol {
+  font-size: 0.82rem;
+}
+
+.gtec-brand-large .gtec-brand-copy strong {
+  font-size: 1.25rem;
+}
+
+
+/* ==========================================
+   HOVER
+========================================== */
+
+.gtec-brand:hover .gtec-logo-core {
+  transform: rotate(0deg) scale(1.08);
+  box-shadow:
+    0 14px 30px rgba(79, 70, 229, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+
+/* ==========================================
+   ANIMATIONS
+========================================== */
+
+@keyframes gtecLogoShine {
+  0%,
+  55% {
+    left: -80%;
+  }
+
+  78%,
+  100% {
+    left: 150%;
+  }
+}
+
+@keyframes gtecOrbitOne {
+  from {
+    transform: rotate(35deg);
+  }
+
+  to {
+    transform: rotate(395deg);
+  }
+}
+
+@keyframes gtecOrbitTwo {
+  from {
+    transform: rotate(35deg);
+  }
+
+  to {
+    transform: rotate(395deg);
+  }
+}
+
+@keyframes gtecDotPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.35);
+    opacity: 0.7;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .gtec-logo-core::before,
+  .gtec-orbit-one,
+  .gtec-orbit-two,
+  .gtec-orbit-dot {
+    animation: none;
+  }
+}
