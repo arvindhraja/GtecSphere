@@ -1170,3 +1170,68 @@
     white-space: normal;
   }
 }
+/* ==========================================
+   MOBILE UPCOMING EVENTS FIX
+========================================== */
+
+@media (max-width: 650px) {
+  .admin-recent-event-item {
+    width: 100%;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .admin-recent-event-icon {
+    width: 58px;
+    height: 58px;
+  }
+
+  .admin-recent-event-info {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-recent-event-info strong {
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .admin-recent-event-info span {
+    font-size: 0.65rem;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .admin-recent-event-info small {
+    margin-top: 4px;
+    font-size: 0.58rem;
+  }
+
+  .admin-recent-event-right {
+    grid-column: 1 / -1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
+  }
+
+  .admin-event-status {
+    min-width: auto;
+  }
+
+  .admin-recent-event-right button {
+    width: 38px;
+    height: 38px;
+  }
+}

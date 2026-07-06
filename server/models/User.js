@@ -38,11 +38,7 @@ const userSchema = new mongoose.Schema(
 
         role: {
             type: String,
-            enum: [
-                "student",
-                "coordinator",
-                "admin"
-            ],
+            enum: ["student", "coordinator", "admin"],
             default: "student"
         },
 
@@ -76,6 +72,28 @@ const userSchema = new mongoose.Schema(
         profileImage: {
             type: String,
             default: ""
+        },
+
+        // ==========================================
+        // FORGOT PASSWORD OTP
+        // ==========================================
+
+        resetPasswordOTP: {
+            type: String,
+            default: null,
+            select: false
+        },
+
+        resetPasswordOTPExpires: {
+            type: Date,
+            default: null,
+            select: false
+        },
+
+        resetPasswordOTPVerified: {
+            type: Boolean,
+            default: false,
+            select: false
         },
 
         // ==========================================
@@ -133,7 +151,4 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model(
-    "User",
-    userSchema
-);
+module.exports = mongoose.model("User", userSchema);

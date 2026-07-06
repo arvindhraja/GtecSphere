@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../App.css";
 import GtecSphereLogo from "../components/GtecSphereLogo.jsx";
 
-const API_BASE_URL =
-  "https://gtecsphere-backend.onrender.com";
+const API_BASE_URL = "http://localhost:5000";
 
 const initialFormData = {
   fullName: "",
@@ -12,7 +11,7 @@ const initialFormData = {
   email: "",
   password: "",
   confirmPassword: "",
-  department: "",
+  department: "IT",
   year: "",
   section: "",
   phone: "",
@@ -20,6 +19,7 @@ const initialFormData = {
 
 function AuthPage() {
   const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -41,6 +41,7 @@ function AuthPage() {
   // ==========================================
   // CUSTOM CURSOR
   // ==========================================
+
   useEffect(() => {
     const handleMouseMove = (event) => {
       setMousePosition({
@@ -61,14 +62,22 @@ function AuthPage() {
     document.addEventListener("mouseover", handleMouseOver);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseover", handleMouseOver);
+      window.removeEventListener(
+        "mousemove",
+        handleMouseMove
+      );
+
+      document.removeEventListener(
+        "mouseover",
+        handleMouseOver
+      );
     };
   }, []);
 
   // ==========================================
   // INPUT CHANGE
   // ==========================================
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -86,11 +95,13 @@ function AuthPage() {
   };
 
   // ==========================================
-  // SWITCH AUTH MODE
+  // SWITCH LOGIN / REGISTER
   // ==========================================
+
   const switchMode = (loginMode) => {
     setIsLogin(loginMode);
     setShowPassword(false);
+
     setMessage({
       type: "",
       text: "",
@@ -100,35 +111,42 @@ function AuthPage() {
   };
 
   // ==========================================
-  // SAVE AUTH DATA
+  // SAVE LOGIN DATA
   // ==========================================
+
   const saveAuthData = (data) => {
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
   };
 
   // ==========================================
-  // ROLE REDIRECT
-  // TEMPORARY UNTIL DASHBOARDS ARE CREATED
+  // REDIRECT BY ROLE
   // ==========================================
+
   const redirectByRole = (user) => {
-  const role = user?.role;
+    const role = user?.role;
 
-  if (role === "admin") {
-    navigate("/admin");
-    return;
-  }
+    if (role === "admin") {
+      navigate("/admin");
+      return;
+    }
 
-  if (role === "coordinator") {
-    navigate("/coordinator");
-    return;
-  }
+    if (role === "coordinator") {
+      navigate("/coordinator");
+      return;
+    }
 
-  navigate("/student");
-};
+    navigate("/student");
+  };
+
   // ==========================================
-  // SUBMIT LOGIN / REGISTER
+  // LOGIN / REGISTER SUBMIT
   // ==========================================
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -137,15 +155,27 @@ function AuthPage() {
       text: "",
     });
 
+    // ========================================
+    // LOGIN VALIDATION
+    // ========================================
+
     if (isLogin) {
-      if (!formData.email.trim() || !formData.password) {
+      if (
+        !formData.email.trim() ||
+        !formData.password
+      ) {
         setMessage({
           type: "error",
           text: "Please enter your email and password.",
         });
+
         return;
       }
     }
+
+    // ========================================
+    // REGISTRATION VALIDATION
+    // ========================================
 
     if (!isLogin) {
       const requiredFields = [
@@ -153,25 +183,33 @@ function AuthPage() {
         formData.registerNumber,
         formData.email,
         formData.password,
-        formData.department,
         formData.year,
         formData.section,
         formData.phone,
       ];
 
-      if (requiredFields.some((field) => !String(field).trim())) {
+      if (
+        requiredFields.some(
+          (field) => !String(field).trim()
+        )
+      ) {
         setMessage({
           type: "error",
           text: "Please complete all registration fields.",
         });
+
         return;
       }
 
-      if (formData.password !== formData.confirmPassword) {
+      if (
+        formData.password !==
+        formData.confirmPassword
+      ) {
         setMessage({
           type: "error",
           text: "Passwords do not match.",
         });
+
         return;
       }
 
@@ -180,6 +218,7 @@ function AuthPage() {
           type: "error",
           text: "Password must contain at least 6 characters.",
         });
+
         return;
       }
     }
@@ -193,25 +232,43 @@ function AuthPage() {
 
       const requestBody = isLogin
         ? {
-            email: formData.email.trim().toLowerCase(),
+            email: formData.email
+              .trim()
+              .toLowerCase(),
+
             password: formData.password,
           }
         : {
             fullName: formData.fullName.trim(),
-            registerNumber: formData.registerNumber.trim(),
-            email: formData.email.trim().toLowerCase(),
+
+            registerNumber:
+              formData.registerNumber.trim(),
+
+            email: formData.email
+              .trim()
+              .toLowerCase(),
+
             password: formData.password,
-            department: formData.department,
+
+            // IT DEPARTMENT ONLY
+            department: "IT",
+
             year: formData.year,
-            section: formData.section.trim().toUpperCase(),
+
+            section: formData.section
+              .trim()
+              .toUpperCase(),
+
             phone: formData.phone.trim(),
           };
 
       const response = await fetch(endpoint, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify(requestBody),
       });
 
@@ -222,30 +279,47 @@ function AuthPage() {
       if (!response.ok || !data.success) {
         setMessage({
           type: "error",
-          text: data.message || "Something went wrong. Please try again.",
+
+          text:
+            data.message ||
+            "Something went wrong. Please try again.",
         });
+
         return;
       }
 
-      // Save token and user for BOTH registration and login
       saveAuthData(data);
+
+      // ========================================
+      // REGISTRATION SUCCESS
+      // ========================================
 
       if (!isLogin) {
         setMessage({
           type: "success",
-          text: "Registration Successful! Opening Student Dashboard...",
+
+          text:
+            "Registration Successful! Opening Student Portal...",
         });
 
         setTimeout(() => {
-          navigate("/student", { replace: true });
+          navigate("/student", {
+            replace: true,
+          });
         }, 1500);
 
         return;
       }
 
+      // ========================================
+      // LOGIN SUCCESS
+      // ========================================
+
       setMessage({
         type: "success",
-        text: "Login Successful! Opening your dashboard...",
+
+        text:
+          "Login Successful! Opening your portal...",
       });
 
       setTimeout(() => {
@@ -256,6 +330,7 @@ function AuthPage() {
 
       setMessage({
         type: "error",
+
         text:
           error.message ||
           "Unable to connect to the server. Please try again.",
@@ -267,7 +342,10 @@ function AuthPage() {
 
   return (
     <>
-      {/* MOUSE GLOW */}
+      {/* ======================================
+          MOUSE GLOW
+      ====================================== */}
+
       <div
         className="mouse-glow"
         style={{
@@ -276,7 +354,10 @@ function AuthPage() {
         }}
       />
 
-      {/* CUSTOM CURSOR */}
+      {/* ======================================
+          CUSTOM CURSOR
+      ====================================== */}
+
       <div
         className={`custom-cursor ${
           isHovering ? "cursor-hover" : ""
@@ -288,74 +369,115 @@ function AuthPage() {
       />
 
       <main className="auth-page">
-        {/* ======================================
+        {/* ====================================
             LEFT BRAND PANEL
-        ====================================== */}
+        ==================================== */}
 
         <section className="brand-panel">
           <div className="brand-content">
-            <div className="logo" data-cursor-hover>
-  <GtecSphereLogo
-    size="large"
-    variant="dark"
-  />
-</div>
+            <div
+              className="logo"
+              data-cursor-hover
+            >
+              <GtecSphereLogo
+                size="large"
+                variant="dark"
+              />
+            </div>
+
+            {/* DEPARTMENT IDENTITY */}
+
+            <div className="department-identity">
+              <span>DEPARTMENT OF</span>
+
+              <strong>
+                INFORMATION TECHNOLOGY
+              </strong>
+            </div>
 
             <div className="hero-content">
               <p className="eyebrow">
-                YOUR CAMPUS. ONE SPHERE.
+                WE CODE EVENTS
               </p>
 
               <h1>
                 Connect. Learn.
                 <br />
+
                 <span>Grow Together.</span>
               </h1>
 
               <p className="hero-description">
-                A smarter digital platform for students,
-                events, certificates, opportunities and your
-                complete campus journey.
+                The official digital event platform for the
+                Department of Information Technology.
+                Discover events, participate, earn
+                certificates and celebrate every
+                achievement in one sphere.
               </p>
 
               <div className="feature-row">
-                <div className="feature" data-cursor-hover>
+                <div
+                  className="feature"
+                  data-cursor-hover
+                >
                   <strong>01</strong>
                   <span>Discover Events</span>
                 </div>
 
-                <div className="feature" data-cursor-hover>
+                <div
+                  className="feature"
+                  data-cursor-hover
+                >
                   <strong>02</strong>
-                  <span>Build Your Profile</span>
+                  <span>Participate</span>
                 </div>
 
-                <div className="feature" data-cursor-hover>
+                <div
+                  className="feature"
+                  data-cursor-hover
+                >
                   <strong>03</strong>
-                  <span>Grow Your Network</span>
+                  <span>Earn Certificates</span>
                 </div>
               </div>
             </div>
 
             <p className="brand-footer">
-              Built for students. Powered by zoro.
+              Department of Information Technology
+              <span> · </span>
+              GtecSphere
             </p>
           </div>
         </section>
 
-        {/* ======================================
+        {/* ====================================
             RIGHT AUTH PANEL
-        ====================================== */}
+        ==================================== */}
 
         <section className="form-panel">
+          {/* MOBILE BRAND */}
+
           <div className="mobile-logo">
-            <span className="logo-icon">G</span>
-            <span>GtecSphere</span>
+            <GtecSphereLogo
+              size="small"
+              variant="light"
+            />
+
+            <div className="mobile-department-name">
+              <strong>GtecSphere</strong>
+
+              <span>
+                Department of Information Technology
+              </span>
+            </div>
           </div>
 
           <div
             key={isLogin ? "login" : "register"}
             className={`auth-container auth-enter ${
-              !isLogin ? "register-container" : ""
+              !isLogin
+                ? "register-container"
+                : ""
             }`}
           >
             {/* AUTH HEADER */}
@@ -364,7 +486,7 @@ function AuthPage() {
               <p className="welcome-text">
                 {isLogin
                   ? "WELCOME BACK"
-                  : "JOIN THE SPHERE"}
+                  : "JOIN THE IT SPHERE"}
               </p>
 
               <h2>
@@ -376,7 +498,7 @@ function AuthPage() {
               <p>
                 {isLogin
                   ? "Continue your GtecSphere journey."
-                  : "Start your GtecSphere journey today."}
+                  : "Join the Department of Information Technology event community."}
               </p>
             </div>
 
@@ -385,8 +507,12 @@ function AuthPage() {
             <div className="auth-tabs">
               <button
                 type="button"
-                className={isLogin ? "active" : ""}
-                onClick={() => switchMode(true)}
+                className={
+                  isLogin ? "active" : ""
+                }
+                onClick={() =>
+                  switchMode(true)
+                }
                 disabled={loading}
               >
                 Login
@@ -394,8 +520,12 @@ function AuthPage() {
 
               <button
                 type="button"
-                className={!isLogin ? "active" : ""}
-                onClick={() => switchMode(false)}
+                className={
+                  !isLogin ? "active" : ""
+                }
+                onClick={() =>
+                  switchMode(false)
+                }
                 disabled={loading}
               >
                 Register
@@ -410,7 +540,9 @@ function AuthPage() {
                 role="alert"
               >
                 <span>
-                  {message.type === "success" ? "✓" : "!"}
+                  {message.type === "success"
+                    ? "✓"
+                    : "!"}
                 </span>
 
                 <p>{message.text}</p>
@@ -423,46 +555,46 @@ function AuthPage() {
               className="auth-form"
               onSubmit={handleSubmit}
             >
-              {/* REGISTER FIELDS */}
+              {/* REGISTER NAME DETAILS */}
 
               {!isLogin && (
-                <>
-                  <div className="register-grid">
-                    <div className="input-group">
-                      <label htmlFor="fullName">
-                        Full Name
-                      </label>
+                <div className="register-grid">
+                  <div className="input-group">
+                    <label htmlFor="fullName">
+                      Full Name
+                    </label>
 
-                      <input
-                        id="fullName"
-                        name="fullName"
-                        type="text"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        placeholder="Enter your full name"
-                        autoComplete="name"
-                        disabled={loading}
-                      />
-                    </div>
-
-                    <div className="input-group">
-                      <label htmlFor="registerNumber">
-                        Register Number
-                      </label>
-
-                      <input
-                        id="registerNumber"
-                        name="registerNumber"
-                        type="text"
-                        value={formData.registerNumber}
-                        onChange={handleChange}
-                        placeholder="College register number"
-                        autoComplete="off"
-                        disabled={loading}
-                      />
-                    </div>
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                      autoComplete="name"
+                      disabled={loading}
+                    />
                   </div>
-                </>
+
+                  <div className="input-group">
+                    <label htmlFor="registerNumber">
+                      Register Number
+                    </label>
+
+                    <input
+                      id="registerNumber"
+                      name="registerNumber"
+                      type="text"
+                      value={
+                        formData.registerNumber
+                      }
+                      onChange={handleChange}
+                      placeholder="College register number"
+                      autoComplete="off"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
               )}
 
               {/* EMAIL */}
@@ -478,62 +610,46 @@ function AuthPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="you@example.com"
+                  placeholder="Enter your registered email"
                   autoComplete="email"
                   disabled={loading}
                 />
               </div>
 
-              {/* REGISTER ACADEMIC DETAILS */}
+              {/* ACADEMIC DETAILS */}
 
               {!isLogin && (
                 <>
                   <div className="register-grid">
+                    {/* FIXED IT DEPARTMENT */}
+
                     <div className="input-group">
                       <label htmlFor="department">
                         Department
                       </label>
 
-                      <select
-                        id="department"
-                        name="department"
-                        value={formData.department}
-                        onChange={handleChange}
-                        disabled={loading}
-                      >
-                        <option value="">
-                          Select department
-                        </option>
+                      <div className="fixed-department-field">
+                        <span className="department-code">
+                          IT
+                        </span>
 
-                        <option value="IT">
-                          Information Technology
-                        </option>
+                        <div>
+                          <strong>
+                            Information Technology
+                          </strong>
 
-                        <option value="CSE">
-                          Computer Science
-                        </option>
+                          <small>
+                            Official Department
+                          </small>
+                        </div>
 
-                        <option value="ECE">
-                          Electronics & Communication
-                        </option>
-
-                        <option value="EEE">
-                          Electrical & Electronics
-                        </option>
-
-                        <option value="MECH">
-                          Mechanical Engineering
-                        </option>
-
-                        <option value="CIVIL">
-                          Civil Engineering
-                        </option>
-
-                        <option value="AIDS">
-                          AI & Data Science
-                        </option>
-                      </select>
+                        <span className="department-lock">
+                          ✓
+                        </span>
+                      </div>
                     </div>
+
+                    {/* YEAR */}
 
                     <div className="input-group">
                       <label htmlFor="year">
@@ -551,15 +667,28 @@ function AuthPage() {
                           Select year
                         </option>
 
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
+                        <option value="1">
+                          1st Year
+                        </option>
+
+                        <option value="2">
+                          2nd Year
+                        </option>
+
+                        <option value="3">
+                          3rd Year
+                        </option>
+
+                        <option value="4">
+                          4th Year
+                        </option>
                       </select>
                     </div>
                   </div>
 
                   <div className="register-grid">
+                    {/* SECTION */}
+
                     <div className="input-group">
                       <label htmlFor="section">
                         Section
@@ -576,6 +705,8 @@ function AuthPage() {
                         disabled={loading}
                       />
                     </div>
+
+                    {/* PHONE */}
 
                     <div className="input-group">
                       <label htmlFor="phone">
@@ -621,7 +752,9 @@ function AuthPage() {
                     id="password"
                     name="password"
                     type={
-                      showPassword ? "text" : "password"
+                      showPassword
+                        ? "text"
+                        : "password"
                     }
                     value={formData.password}
                     onChange={handleChange}
@@ -643,7 +776,9 @@ function AuthPage() {
                       )
                     }
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword
+                      ? "Hide"
+                      : "Show"}
                   </button>
                 </div>
               </div>
@@ -660,7 +795,9 @@ function AuthPage() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
-                    value={formData.confirmPassword}
+                    value={
+                      formData.confirmPassword
+                    }
                     onChange={handleChange}
                     placeholder="Enter password again"
                     autoComplete="new-password"
@@ -692,13 +829,15 @@ function AuthPage() {
                       ? "Sign In"
                       : "Create Account"}
 
-                    <span className="submit-arrow">→</span>
+                    <span className="submit-arrow">
+                      →
+                    </span>
                   </>
                 )}
               </button>
             </form>
 
-            {/* SWITCH AUTH MODE */}
+            {/* SWITCH MODE */}
 
             <p className="switch-text">
               {isLogin
@@ -707,7 +846,9 @@ function AuthPage() {
 
               <button
                 type="button"
-                onClick={() => switchMode(!isLogin)}
+                onClick={() =>
+                  switchMode(!isLogin)
+                }
                 disabled={loading}
               >
                 {isLogin
@@ -718,7 +859,8 @@ function AuthPage() {
           </div>
 
           <p className="form-footer">
-            © 2026 GtecSphere · Privacy · Terms
+            © 2026 GtecSphere · Department of
+            Information Technology
           </p>
         </section>
       </main>
@@ -726,4 +868,4 @@ function AuthPage() {
   );
 }
 
-export default AuthPage;   
+export default AuthPage;

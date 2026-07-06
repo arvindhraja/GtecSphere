@@ -1238,3 +1238,160 @@ a {
     transform: none;
   }
 }
+/* ==========================================
+   IT DEPARTMENT IDENTITY
+========================================== */
+
+.department-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 24px;
+  margin-bottom: 28px;
+}
+
+.department-identity span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.department-identity strong {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #55dcff;
+}
+
+
+/* ==========================================
+   FIXED IT DEPARTMENT FIELD
+========================================== */
+
+.fixed-department-field {
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #ffffff;
+  border: 1px solid #d9e2f0;
+  border-radius: 14px;
+
+  box-sizing: border-box;
+}
+
+.department-code {
+  width: 38px;
+  height: 38px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #246bfe,
+    #7657ff
+  );
+
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.fixed-department-field > div {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fixed-department-field strong {
+  display: block;
+
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  color: #0b1739;
+}
+
+.fixed-department-field small {
+  display: block;
+
+  font-size: 10px;
+  line-height: 1.2;
+
+  color: #8190aa;
+}
+
+.department-lock {
+  width: 24px;
+  height: 24px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e8fff2;
+  color: #16a765;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* ==========================================
+   MOBILE DEPARTMENT BRAND
+========================================== */
+
+.mobile-department-name {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mobile-department-name strong {
+  font-size: 14px;
+  color: #0b1739;
+}
+
+.mobile-department-name span {
+  font-size: 9px;
+  color: #8190aa;
+}
+
+
+/* ==========================================
+   RESPONSIVE FIX
+========================================== */
+
+@media (max-width: 768px) {
+  .fixed-department-field {
+    min-height: 58px;
+  }
+
+  .fixed-department-field strong {
+    font-size: 12px;
+  }
+
+  .department-identity {
+    margin-top: 16px;
+    margin-bottom: 20px;
+  }
+}

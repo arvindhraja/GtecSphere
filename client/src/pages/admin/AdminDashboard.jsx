@@ -7,7 +7,9 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import "./AdminDashboard.css";
+
 import GtecSphereLogo from "../../components/GtecSphereLogo.jsx";
+
 import CoordinatorEvents from "../coordinator/CoordinatorEvents.jsx";
 import CoordinatorRegistrations from "../coordinator/CoordinatorRegistrations.jsx";
 import CoordinatorSeats from "../coordinator/CoordinatorSeats.jsx";
@@ -20,6 +22,10 @@ import AdminCoordinators from "./AdminCoordinators.jsx";
 
 const API_URL = "https://gtecsphere-backend.onrender.com/api";
 
+
+// ==========================================
+// MENU ITEMS
+// ==========================================
 
 const menuItems = [
   {
@@ -65,6 +71,10 @@ const menuItems = [
 ];
 
 
+// ==========================================
+// PAGE TITLES
+// ==========================================
+
 const pageTitles = {
   dashboard: "Dashboard",
   events: "Event Management",
@@ -79,6 +89,11 @@ const pageTitles = {
 
 function AdminDashboard() {
   const navigate = useNavigate();
+
+
+  // ==========================================
+  // STATE
+  // ==========================================
 
   const [activePage, setActivePage] =
     useState("dashboard");
@@ -100,7 +115,9 @@ function AdminDashboard() {
   // CURRENT ADMIN USER
   // ==========================================
 
-  const savedUser = localStorage.getItem("user");
+  const savedUser =
+    localStorage.getItem("user") ||
+    sessionStorage.getItem("user");
 
   let user = {};
 
@@ -108,7 +125,12 @@ function AdminDashboard() {
     user = savedUser
       ? JSON.parse(savedUser)
       : {};
-  } catch {
+  } catch (error) {
+    console.error(
+      "INVALID SAVED USER:",
+      error
+    );
+
     user = {};
   }
 
@@ -125,6 +147,18 @@ function AdminDashboard() {
 
 
   // ==========================================
+  // GET TOKEN
+  // ==========================================
+
+  const getToken = () => {
+    return (
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token")
+    );
+  };
+
+
+  // ==========================================
   // FETCH LIVE ADMIN DASHBOARD
   // ==========================================
 
@@ -134,6 +168,8 @@ function AdminDashboard() {
         setDashboardLoading(true);
         setDashboardError("");
 
+        const token = getToken();
+
         const response = await fetch(
           `${API_URL}/admin/stats`,
           {
@@ -142,13 +178,19 @@ function AdminDashboard() {
             credentials: "include",
 
             headers: {
-  "Content-Type": "application/json",
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                `Bearer ${token}`,
+            },
           }
         );
 
-        const data = await response.json();
+
+        const data =
+          await response.json();
+
 
         if (!response.ok) {
           throw new Error(
@@ -156,6 +198,7 @@ function AdminDashboard() {
               "Failed to load dashboard"
           );
         }
+
 
         setDashboardData(
           data.dashboard || null
@@ -166,6 +209,7 @@ function AdminDashboard() {
           "ADMIN DASHBOARD FETCH ERROR:",
           error
         );
+
 
         setDashboardError(
           error.message ||
@@ -178,13 +222,17 @@ function AdminDashboard() {
     }, []);
 
 
+  // ==========================================
+  // LOAD DASHBOARD
+  // ==========================================
+
   useEffect(() => {
     fetchDashboardStats();
   }, [fetchDashboardStats]);
 
 
   // ==========================================
-  // REFRESH DASHBOARD WHEN RETURNING HOME
+  // REFRESH WHEN RETURNING TO DASHBOARD
   // ==========================================
 
   useEffect(() => {
@@ -198,23 +246,53 @@ function AdminDashboard() {
 
 
   // ==========================================
+  // CLOSE SIDEBAR WITH ESCAPE KEY
+  // ==========================================
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener(
+      "keydown",
+      handleEscape
+    );
+
+    return () => {
+      window.removeEventListener(
+        "keydown",
+        handleEscape
+      );
+    };
+  }, []);
+
+
+  // ==========================================
   // LIVE VALUES
   // ==========================================
 
   const totalEvents =
     dashboardData?.events?.total || 0;
 
+
   const totalRegistrations =
     dashboardData?.registrations?.total || 0;
+
 
   const totalStudents =
     dashboardData?.users?.students || 0;
 
+
   const totalCoordinators =
     dashboardData?.users?.coordinators || 0;
 
+
   const totalCertificates =
     dashboardData?.certificates?.total || 0;
+
 
   const recentEvents =
     dashboardData?.recentEvents || [];
@@ -226,6 +304,7 @@ function AdminDashboard() {
 
   const handleMenuClick = (pageId) => {
     setActivePage(pageId);
+
     setSidebarOpen(false);
   };
 
@@ -237,6 +316,11 @@ function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+
+    setSidebarOpen(false);
 
     navigate("/");
   };
@@ -251,9 +335,16 @@ function AdminDashboard() {
       return "Date not set";
     }
 
-    return new Date(
-      dateValue
-    ).toLocaleDateString(
+    const date =
+      new Date(dateValue);
+
+    if (
+      Number.isNaN(date.getTime())
+    ) {
+      return "Date not set";
+    }
+
+    return date.toLocaleDateString(
       "en-IN",
       {
         day: "2-digit",
@@ -264,19 +355,16 @@ function AdminDashboard() {
   };
 
 
-  // ==========================================
-  // UI
-  // ==========================================
-
   return (
     <div className="admin-app">
 
-      {/* ======================================
+      {/* =====================================
           MOBILE OVERLAY
-      ====================================== */}
+      ===================================== */}
 
       {sidebarOpen && (
         <button
+          type="button"
           className="admin-sidebar-overlay"
           onClick={() =>
             setSidebarOpen(false)
@@ -286,9 +374,9 @@ function AdminDashboard() {
       )}
 
 
-      {/* ======================================
+      {/* =====================================
           SIDEBAR
-      ====================================== */}
+      ===================================== */}
 
       <aside
         className={
@@ -297,186 +385,266 @@ function AdminDashboard() {
             : "admin-sidebar"
         }
       >
+
+        {/* SIDEBAR HEADER */}
+
         <div className="admin-sidebar-header">
+
           <div className="admin-logo">
-  <GtecSphereLogo
-    size="small"
-    variant="light"
-    subtitle="ADMIN CONTROL"
-  />
-</div>
+
+            <GtecSphereLogo
+              size="small"
+              variant="light"
+              subtitle="IT ADMIN CONTROL"
+            />
+
+          </div>
+
 
           <button
+            type="button"
             className="admin-sidebar-close"
             onClick={() =>
               setSidebarOpen(false)
             }
+            aria-label="Close sidebar"
           >
             ×
           </button>
+
         </div>
 
 
+        {/* ADMIN ROLE */}
+
         <div className="admin-role-card">
+
           <span>♛</span>
 
           <div>
-            <small>SIGNED IN AS</small>
-            <strong>Administrator</strong>
+            <small>
+              SIGNED IN AS
+            </small>
+
+            <strong>
+              Administrator
+            </strong>
           </div>
+
         </div>
 
 
+        {/* SIDEBAR NAVIGATION */}
+
         <nav className="admin-sidebar-nav">
+
           <p className="admin-menu-label">
-            MANAGEMENT
+            IT DEPARTMENT MANAGEMENT
           </p>
 
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
 
+          {menuItems.map((item) => (
+
+            <button
+              type="button"
+              key={item.id}
               className={
                 activePage === item.id
                   ? "active"
                   : ""
               }
-
               onClick={() =>
                 handleMenuClick(item.id)
               }
             >
-              <span>{item.icon}</span>
+
+              <span>
+                {item.icon}
+              </span>
 
               {item.label}
+
             </button>
+
           ))}
+
         </nav>
 
 
+        {/* SIDEBAR BOTTOM */}
+
         <div className="admin-sidebar-bottom">
+
           <div className="admin-system-status">
+
             <span className="admin-status-dot" />
 
             <div>
-              <strong>System Online</strong>
+
+              <strong>
+                System Online
+              </strong>
 
               <small>
-                All services operational
+                IT event services operational
               </small>
+
             </div>
+
           </div>
 
+
           <button
+            type="button"
             className="admin-logout-button"
             onClick={handleLogout}
           >
+
             <span>↪</span>
+
             Logout
+
           </button>
+
         </div>
+
       </aside>
 
 
-      {/* ======================================
-          MAIN
-      ====================================== */}
+      {/* =====================================
+          MAIN CONTENT
+      ===================================== */}
 
       <main className="admin-main">
 
-        {/* ====================================
-            TOPBAR
-        ==================================== */}
+
+        {/* =====================================
+            TOP BAR
+        ===================================== */}
 
         <header className="admin-topbar">
-          <div className="admin-topbar-left">
-            <button
-              className="admin-menu-button"
 
+          <div className="admin-topbar-left">
+
+            <button
+              type="button"
+              className="admin-menu-button"
               onClick={() =>
                 setSidebarOpen(true)
               }
+              aria-label="Open sidebar"
             >
               ☰
             </button>
 
+
             <div>
-              <p>ADMIN PORTAL</p>
+
+              <p>
+                INFORMATION TECHNOLOGY
+              </p>
 
               <h2>
                 {pageTitles[activePage]}
               </h2>
+
             </div>
+
           </div>
 
 
           <div className="admin-topbar-actions">
-            <button className="admin-notification-button">
+
+            <button
+              type="button"
+              className="admin-notification-button"
+            >
               ♢
               <span />
             </button>
 
+
             <div className="admin-profile-button">
+
               <span className="admin-avatar">
+
                 {firstName
                   .charAt(0)
                   .toUpperCase()}
+
               </span>
 
+
               <div>
+
                 <strong>
                   {adminName}
                 </strong>
 
                 <small>
-                  Administrator
+                  IT Department Administrator
                 </small>
+
               </div>
+
             </div>
+
           </div>
+
         </header>
 
 
-        {/* ====================================
+        {/* =====================================
             DASHBOARD PAGE
-        ==================================== */}
+        ===================================== */}
 
         {activePage === "dashboard" && (
+
           <div className="admin-content">
 
-            {/* ==================================
-                WELCOME
-            ================================== */}
+
+            {/* WELCOME */}
 
             <section className="admin-welcome-card">
+
               <div>
+
                 <p className="admin-welcome-label">
-                  SYSTEM OVERVIEW
+                  INFORMATION TECHNOLOGY DEPARTMENT
                 </p>
+
 
                 <h1>
                   Welcome back, {firstName} 👑
                 </h1>
 
+
                 <p>
-                  Manage the entire campus event
-                  ecosystem from one command center.
+                  Manage the Information Technology
+                  Department event ecosystem from one
+                  command center.
                 </p>
+
               </div>
 
+
               <div className="admin-welcome-decoration">
-                <span>G</span>
+
+                <span>IT</span>
+
               </div>
+
             </section>
 
 
-            {/* ==================================
-                ERROR
-            ================================== */}
+            {/* ERROR */}
 
             {dashboardError && (
+
               <div className="students-error-banner">
+
                 <div>
+
                   <strong>
                     Dashboard connection error
                   </strong>
@@ -484,33 +652,41 @@ function AdminDashboard() {
                   <span>
                     {dashboardError}
                   </span>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={
                     fetchDashboardStats
                   }
                 >
                   Retry
                 </button>
+
               </div>
+
             )}
 
 
-            {/* ==================================
-                MAIN LIVE STATS
-            ================================== */}
+            {/* =====================================
+                STATS
+            ===================================== */}
 
             <section className="admin-stats-grid">
 
-              {/* TOTAL EVENTS */}
+
+              {/* EVENTS */}
 
               <article>
+
                 <div className="admin-stat-icon events">
                   ◫
                 </div>
 
                 <div>
+
                   <p>Total Events</p>
 
                   <h3>
@@ -520,28 +696,34 @@ function AdminDashboard() {
                   </h3>
 
                   <small>
-                    Across all departments
+                    IT Department events
                   </small>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={() =>
                     setActivePage("events")
                   }
                 >
                   →
                 </button>
+
               </article>
 
 
               {/* REGISTRATIONS */}
 
               <article>
+
                 <div className="admin-stat-icon students">
                   👥
                 </div>
 
                 <div>
+
                   <p>Registrations</p>
 
                   <h3>
@@ -551,11 +733,14 @@ function AdminDashboard() {
                   </h3>
 
                   <small>
-                    Total event registrations
+                    IT event registrations
                   </small>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={() =>
                     setActivePage(
                       "registrations"
@@ -564,17 +749,20 @@ function AdminDashboard() {
                 >
                   →
                 </button>
+
               </article>
 
 
               {/* STUDENTS */}
 
               <article>
+
                 <div className="admin-stat-icon students">
                   ◎
                 </div>
 
                 <div>
+
                   <p>Students</p>
 
                   <h3>
@@ -584,28 +772,34 @@ function AdminDashboard() {
                   </h3>
 
                   <small>
-                    Registered student accounts
+                    Registered IT students
                   </small>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={() =>
                     setActivePage("students")
                   }
                 >
                   →
                 </button>
+
               </article>
 
 
               {/* COORDINATORS */}
 
               <article>
+
                 <div className="admin-stat-icon coordinators">
                   ♟
                 </div>
 
                 <div>
+
                   <p>Coordinators</p>
 
                   <h3>
@@ -615,11 +809,14 @@ function AdminDashboard() {
                   </h3>
 
                   <small>
-                    Coordinator accounts
+                    IT event coordinators
                   </small>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={() =>
                     setActivePage(
                       "coordinators"
@@ -628,17 +825,20 @@ function AdminDashboard() {
                 >
                   →
                 </button>
+
               </article>
 
 
               {/* CERTIFICATES */}
 
               <article>
+
                 <div className="admin-stat-icon certificates">
                   ◇
                 </div>
 
                 <div>
+
                   <p>Certificates</p>
 
                   <h3>
@@ -648,11 +848,14 @@ function AdminDashboard() {
                   </h3>
 
                   <small>
-                    Total certificates issued
+                    IT event certificates issued
                   </small>
+
                 </div>
 
+
                 <button
+                  type="button"
                   onClick={() =>
                     setActivePage(
                       "certificates"
@@ -661,39 +864,54 @@ function AdminDashboard() {
                 >
                   →
                 </button>
+
               </article>
+
             </section>
 
 
-            {/* ==================================
+            {/* =====================================
                 MAIN DASHBOARD GRID
-            ================================== */}
+            ===================================== */}
 
             <section className="admin-dashboard-grid">
 
-              {/* =================================
-                  RECENT EVENTS
-              ================================= */}
+
+              {/* RECENT EVENTS */}
 
               <div className="admin-dashboard-panel">
+
                 <div className="admin-panel-heading">
+
                   <div>
-                    <p>ACTIVITY</p>
-                    <h2>Recent Events</h2>
+
+                    <p>
+                      IT DEPARTMENT ACTIVITY
+                    </p>
+
+                    <h2>
+                      Recent Events
+                    </h2>
+
                   </div>
 
+
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage("events")
                     }
                   >
                     View all →
                   </button>
+
                 </div>
 
 
                 {dashboardLoading ? (
+
                   <div className="admin-empty-state">
+
                     <div>↻</div>
 
                     <h3>
@@ -701,54 +919,73 @@ function AdminDashboard() {
                     </h3>
 
                     <p>
-                      Fetching live activity from
-                      MongoDB.
+                      Fetching IT Department event
+                      activity from MongoDB.
                     </p>
+
                   </div>
+
                 ) : recentEvents.length === 0 ? (
+
                   <div className="admin-empty-state">
+
                     <div>◫</div>
 
                     <h3>
-                      No events created yet
+                      No IT events created yet
                     </h3>
 
                     <p>
-                      Events created by admins and
-                      coordinators will appear here.
+                      IT Department events created by
+                      administrators and coordinators
+                      will appear here.
                     </p>
 
+
                     <button
+                      type="button"
                       onClick={() =>
                         setActivePage("events")
                       }
                     >
                       Create First Event
                     </button>
+
                   </div>
+
                 ) : (
+
                   <div className="admin-recent-events-list">
+
                     {recentEvents.map(
                       (event) => (
+
                         <article
                           key={event._id}
                           className="admin-recent-event-item"
                         >
+
                           <div className="admin-recent-event-icon">
                             ◫
                           </div>
 
+
                           <div className="admin-recent-event-info">
+
                             <strong>
                               {event.title}
                             </strong>
 
                             <span>
+
                               {event.category ||
-                                "Event"}
+                                "IT Event"}
+
                               {" • "}
+
                               {event.venue ||
                                 "Venue not set"}
+
                             </span>
 
                             <small>
@@ -756,9 +993,12 @@ function AdminDashboard() {
                                 event.date
                               )}
                             </small>
+
                           </div>
 
+
                           <div className="admin-recent-event-right">
+
                             <span
                               className={`admin-event-status ${
                                 event.status
@@ -770,7 +1010,9 @@ function AdminDashboard() {
                                 "Upcoming"}
                             </span>
 
+
                             <button
+                              type="button"
                               onClick={() =>
                                 setActivePage(
                                   "events"
@@ -779,40 +1021,57 @@ function AdminDashboard() {
                             >
                               →
                             </button>
+
                           </div>
+
                         </article>
+
                       )
                     )}
+
                   </div>
+
                 )}
+
               </div>
 
 
-              {/* =================================
-                  ADMIN CONTROLS
-              ================================= */}
+              {/* QUICK CONTROLS */}
 
               <aside className="admin-control-panel">
+
                 <div className="admin-panel-heading">
+
                   <div>
-                    <p>QUICK ACCESS</p>
-                    <h2>Admin Controls</h2>
+
+                    <p>
+                      QUICK ACCESS
+                    </p>
+
+                    <h2>
+                      IT Admin Controls
+                    </h2>
+
                   </div>
+
                 </div>
 
 
                 <div className="admin-control-list">
 
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage("events")
                     }
                   >
+
                     <span className="control-icon">
                       ◫
                     </span>
 
                     <div>
+
                       <strong>
                         Manage Events
                       </strong>
@@ -820,97 +1079,117 @@ function AdminDashboard() {
                       <small>
                         Create, edit and publish
                       </small>
+
                     </div>
 
                     <b>→</b>
+
                   </button>
 
 
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage("students")
                     }
                   >
+
                     <span className="control-icon">
                       ◎
                     </span>
 
                     <div>
+
                       <strong>
                         Manage Students
                       </strong>
 
                       <small>
-                        View and control accounts
+                        View IT student accounts
                       </small>
+
                     </div>
 
                     <b>→</b>
+
                   </button>
 
 
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage(
                         "coordinators"
                       )
                     }
                   >
+
                     <span className="control-icon">
                       ♟
                     </span>
 
                     <div>
+
                       <strong>
                         Manage Coordinators
                       </strong>
 
                       <small>
-                        Create and manage accounts
+                        Manage IT coordinators
                       </small>
+
                     </div>
 
                     <b>→</b>
+
                   </button>
 
 
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage(
                         "registrations"
                       )
                     }
                   >
+
                     <span className="control-icon">
                       👥
                     </span>
 
                     <div>
+
                       <strong>
                         View Registrations
                       </strong>
 
                       <small>
-                        Manage all participants
+                        Manage event participants
                       </small>
+
                     </div>
 
                     <b>→</b>
+
                   </button>
 
 
                   <button
+                    type="button"
                     onClick={() =>
                       setActivePage(
                         "certificates"
                       )
                     }
                   >
+
                     <span className="control-icon">
                       ◇
                     </span>
 
                     <div>
+
                       <strong>
                         Issue Certificates
                       </strong>
@@ -918,175 +1197,240 @@ function AdminDashboard() {
                       <small>
                         Manage event recognition
                       </small>
+
                     </div>
 
                     <b>→</b>
+
                   </button>
+
                 </div>
+
               </aside>
+
             </section>
 
 
-            {/* ==================================
+            {/* =====================================
                 SYSTEM OVERVIEW
-            ================================== */}
+            ===================================== */}
 
             <section className="admin-system-overview">
+
               <div className="admin-panel-heading">
+
                 <div>
-                  <p>PLATFORM</p>
-                  <h2>System Overview</h2>
+
+                  <p>
+                    IT DEPARTMENT PLATFORM
+                  </p>
+
+                  <h2>
+                    System Overview
+                  </h2>
+
                 </div>
+
               </div>
 
 
               <div className="admin-overview-grid">
+
                 <article>
+
                   <span>✓</span>
 
                   <div>
+
                     <strong>
-                      Event Management
+                      IT Event Management
                     </strong>
 
-                    <small>Operational</small>
+                    <small>
+                      Operational
+                    </small>
+
                   </div>
+
                 </article>
 
 
                 <article>
+
                   <span>✓</span>
 
                   <div>
+
                     <strong>
                       Student Registration
                     </strong>
 
-                    <small>Operational</small>
+                    <small>
+                      Operational
+                    </small>
+
                   </div>
+
                 </article>
 
 
                 <article>
+
                   <span>✓</span>
 
                   <div>
+
                     <strong>
-                      Student Management
+                      IT Student Management
                     </strong>
 
-                    <small>Operational</small>
+                    <small>
+                      Operational
+                    </small>
+
                   </div>
+
                 </article>
 
 
                 <article>
+
                   <span>✓</span>
 
                   <div>
+
                     <strong>
                       Coordinator Portal
                     </strong>
 
-                    <small>Operational</small>
+                    <small>
+                      Operational
+                    </small>
+
                   </div>
+
                 </article>
 
 
                 <article>
+
                   <span>✓</span>
 
                   <div>
+
                     <strong>
                       Backend Integration
                     </strong>
 
-                    <small>Connected</small>
+                    <small>
+                      Connected
+                    </small>
+
                   </div>
+
                 </article>
+
               </div>
+
             </section>
+
           </div>
+
         )}
 
 
-        {/* ====================================
-            EVENT MANAGEMENT PAGE
-        ==================================== */}
+        {/* =====================================
+            EVENTS
+        ===================================== */}
 
         {activePage === "events" && (
+
           <div className="admin-content">
             <CoordinatorEvents />
           </div>
+
         )}
 
 
-        {/* ====================================
-            REGISTRATIONS PAGE
-        ==================================== */}
+        {/* =====================================
+            REGISTRATIONS
+        ===================================== */}
 
         {activePage === "registrations" && (
+
           <div className="admin-content">
             <CoordinatorRegistrations />
           </div>
+
         )}
 
 
-        {/* ====================================
-            SEAT MANAGEMENT PAGE
-        ==================================== */}
+        {/* =====================================
+            SEATS
+        ===================================== */}
 
         {activePage === "seats" && (
+
           <div className="admin-content">
             <CoordinatorSeats />
           </div>
+
         )}
 
 
-        {/* ====================================
-            ATTENDANCE PAGE
-        ==================================== */}
+        {/* =====================================
+            ATTENDANCE
+        ===================================== */}
 
         {activePage === "attendance" && (
+
           <div className="admin-content">
             <CoordinatorAttendance />
           </div>
+
         )}
 
 
-        {/* ====================================
-            CERTIFICATES PAGE
-        ==================================== */}
+        {/* =====================================
+            CERTIFICATES
+        ===================================== */}
 
         {activePage === "certificates" && (
+
           <div className="admin-content">
             <CoordinatorCertificates />
           </div>
+
         )}
 
 
-        {/* ====================================
-            STUDENT MANAGEMENT PAGE
-        ==================================== */}
+        {/* =====================================
+            STUDENTS
+        ===================================== */}
 
         {activePage === "students" && (
+
           <div className="admin-content">
             <AdminStudents />
           </div>
+
         )}
 
 
-        {/* ====================================
-            COORDINATOR MANAGEMENT PAGE
-        ==================================== */}
+        {/* =====================================
+            COORDINATORS
+        ===================================== */}
 
         {activePage === "coordinators" && (
+
           <div className="admin-content">
             <AdminCoordinators />
           </div>
+
         )}
 
       </main>
+
     </div>
   );
 }

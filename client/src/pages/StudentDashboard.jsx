@@ -22,6 +22,10 @@ function StudentDashboard() {
   const [activePage, setActivePage] =
     useState("dashboard");
 
+  // ==========================================
+  // REGISTRATIONS STATE
+  // ==========================================
+
   const [registrations, setRegistrations] =
     useState([]);
 
@@ -36,9 +40,26 @@ function StudentDashboard() {
 
 
   // ==========================================
+  // ALL EVENTS STATE
+  // ==========================================
+
+  const [events, setEvents] =
+    useState([]);
+
+  const [eventsLoading, setEventsLoading] =
+    useState(true);
+
+  const [eventsError, setEventsError] =
+    useState("");
+
+
+  // ==========================================
   // GET SAVED USER
   // ==========================================
-  const savedUser = localStorage.getItem("user");
+
+  const savedUser =
+    localStorage.getItem("user") ||
+    sessionStorage.getItem("user");
 
   let user = {};
 
@@ -64,6 +85,7 @@ function StudentDashboard() {
   // ==========================================
   // GET TOKEN
   // ==========================================
+
   const getToken = () => {
     return (
       localStorage.getItem("token") ||
@@ -75,6 +97,7 @@ function StudentDashboard() {
   // ==========================================
   // LOGOUT
   // ==========================================
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -89,6 +112,7 @@ function StudentDashboard() {
   // ==========================================
   // PAGE TITLES
   // ==========================================
+
   const pageTitles = {
     dashboard: "Dashboard",
     events: "Events",
@@ -100,6 +124,7 @@ function StudentDashboard() {
   // ==========================================
   // FETCH MY REGISTRATIONS
   // ==========================================
+
   const fetchMyRegistrations = useCallback(
     async () => {
       try {
@@ -156,29 +181,78 @@ function StudentDashboard() {
 
 
   // ==========================================
+  // FETCH ALL EVENTS
+  // ==========================================
+
+  const fetchEvents = useCallback(
+    async () => {
+      try {
+        setEventsLoading(true);
+        setEventsError("");
+
+        const response = await fetch(
+          `${API_URL}/events`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Unable to load events"
+          );
+        }
+
+        setEvents(data.events || []);
+      } catch (error) {
+        console.error(
+          "DASHBOARD EVENTS ERROR:",
+          error
+        );
+
+        setEventsError(error.message);
+        setEvents([]);
+      } finally {
+        setEventsLoading(false);
+      }
+    },
+    []
+  );
+
+
+  // ==========================================
   // LOAD DASHBOARD DATA
   // ==========================================
+
   useEffect(() => {
     fetchMyRegistrations();
-  }, [fetchMyRegistrations]);
+    fetchEvents();
+  }, [
+    fetchMyRegistrations,
+    fetchEvents,
+  ]);
 
 
   // ==========================================
   // REFRESH WHEN RETURNING TO DASHBOARD
   // ==========================================
+
   useEffect(() => {
     if (activePage === "dashboard") {
       fetchMyRegistrations();
+      fetchEvents();
     }
   }, [
     activePage,
     fetchMyRegistrations,
+    fetchEvents,
   ]);
 
 
   // ==========================================
   // ACTIVE REGISTRATIONS
   // ==========================================
+
   const activeRegistrations =
     registrations.filter(
       (registration) =>
@@ -188,49 +262,43 @@ function StudentDashboard() {
 
 
   // ==========================================
-  // UPCOMING REGISTERED EVENTS
+  // UPCOMING EVENTS
+  // FROM ALL ADMIN / COORDINATOR EVENTS
   // ==========================================
-  const upcomingRegistrations =
-    activeRegistrations
-      .filter((registration) => {
-        if (!registration.event?.date) {
+
+  const upcomingEvents =
+    events
+      .filter((event) => {
+        if (!event?.date) {
           return false;
         }
 
         const eventDate =
-          new Date(
-            registration.event.date
-          );
+          new Date(event.date);
+
+        const today =
+          new Date();
+
+        today.setHours(0, 0, 0, 0);
 
         return (
           !Number.isNaN(
             eventDate.getTime()
           ) &&
-          eventDate >=
-            new Date(
-              new Date().setHours(
-                0,
-                0,
-                0,
-                0
-              )
-            )
+          eventDate >= today
         );
       })
       .sort(
         (first, second) =>
-          new Date(
-            first.event.date
-          ) -
-          new Date(
-            second.event.date
-          )
+          new Date(first.date) -
+          new Date(second.date)
       );
 
 
   // ==========================================
   // FORMAT DATE
   // ==========================================
+
   const formatDate = (dateValue) => {
     if (!dateValue) {
       return "Date not available";
@@ -259,6 +327,7 @@ function StudentDashboard() {
   // ==========================================
   // STATUS CLASS
   // ==========================================
+
   const getStatusClass = (status) => {
     return (
       status || "Registered"
@@ -276,13 +345,15 @@ function StudentDashboard() {
       ===================================== */}
 
       <aside className="student-sidebar">
+
         <div className="dashboard-logo">
-  <GtecSphereLogo
-    size="small"
-    variant="light"
-    subtitle="STUDENT PORTAL"
-  />
-</div>
+          <GtecSphereLogo
+            size="small"
+            variant="light"
+            subtitle="IT STUDENT PORTAL"
+          />
+        </div>
+
 
         <nav className="sidebar-nav">
 
@@ -323,17 +394,13 @@ function StudentDashboard() {
                 : ""
             }
             onClick={() =>
-              setActivePage(
-                "certificates"
-              )
+              setActivePage("certificates")
             }
           >
             <span>◇</span>
             Certificates
           </button>
 
-
-        
 
           <button
             className={
@@ -361,6 +428,7 @@ function StudentDashboard() {
             Logout
           </button>
         </div>
+
       </aside>
 
 
@@ -375,15 +443,17 @@ function StudentDashboard() {
         <header className="student-topbar">
 
           <div className="mobile-dashboard-logo">
-  <GtecSphereLogo
-    size="small"
-    variant="light"
-  />
-</div>
+            <GtecSphereLogo
+              size="small"
+              variant="light"
+            />
+          </div>
 
 
           <div className="topbar-title">
-            <p>STUDENT PORTAL</p>
+            <p>
+              INFORMATION TECHNOLOGY
+            </p>
 
             <h2>
               {pageTitles[activePage]}
@@ -418,13 +488,13 @@ function StudentDashboard() {
                 </strong>
 
                 <small>
-                  {user?.department ||
-                    "Department"}
+                  Information Technology
                 </small>
               </span>
             </button>
 
           </div>
+
         </header>
 
 
@@ -438,6 +508,7 @@ function StudentDashboard() {
             {/* WELCOME */}
 
             <section className="welcome-card">
+
               <div>
                 <p className="welcome-label">
                   WELCOME BACK
@@ -449,15 +520,16 @@ function StudentDashboard() {
                 </h1>
 
                 <p>
-                  Here’s what’s happening
-                  in your campus sphere
-                  today.
+                  Here&apos;s what&apos;s happening
+                  in the Department of Information
+                  Technology today.
                 </p>
               </div>
 
               <div className="welcome-decoration">
-                <span>G</span>
+                <span>IT</span>
               </div>
+
             </section>
 
 
@@ -521,18 +593,21 @@ function StudentDashboard() {
               <article
                 className="stat-card"
                 onClick={() =>
-                  setActivePage(
-                    "opportunities"
-                  )
+                  setActivePage("events")
                 }
               >
                 <div className="stat-icon">
-                  ↗
+                  ◫
                 </div>
 
                 <div>
-                  <p>Opportunities</p>
-                  <h3>0</h3>
+                  <p>Upcoming Events</p>
+
+                  <h3>
+                    {eventsLoading
+                      ? "..."
+                      : upcomingEvents.length}
+                  </h3>
                 </div>
 
                 <span className="stat-link">
@@ -550,6 +625,7 @@ function StudentDashboard() {
             <section className="student-registrations-section">
 
               <div className="section-heading">
+
                 <div>
                   <p>MY ACTIVITY</p>
 
@@ -565,6 +641,7 @@ function StudentDashboard() {
                 >
                   Explore events →
                 </button>
+
               </div>
 
 
@@ -582,6 +659,7 @@ function StudentDashboard() {
               {!registrationsLoading &&
                 registrationsError && (
                   <div className="registration-dashboard-empty">
+
                     <div>!</div>
 
                     <h3>
@@ -599,15 +677,16 @@ function StudentDashboard() {
                     >
                       Try Again
                     </button>
+
                   </div>
                 )}
 
 
               {!registrationsLoading &&
                 !registrationsError &&
-                activeRegistrations.length ===
-                  0 && (
+                activeRegistrations.length === 0 && (
                   <div className="registration-dashboard-empty">
+
                     <div>◫</div>
 
                     <h3>
@@ -615,38 +694,33 @@ function StudentDashboard() {
                     </h3>
 
                     <p>
-                      Register for a campus
-                      event and your
-                      acknowledgement will
-                      appear here.
+                      Register for an IT Department
+                      event and your acknowledgement
+                      will appear here.
                     </p>
 
                     <button
                       onClick={() =>
-                        setActivePage(
-                          "events"
-                        )
+                        setActivePage("events")
                       }
                     >
                       Explore Events
                     </button>
+
                   </div>
                 )}
 
 
               {!registrationsLoading &&
                 !registrationsError &&
-                activeRegistrations.length >
-                  0 && (
+                activeRegistrations.length > 0 && (
                   <div className="student-registration-grid">
 
                     {activeRegistrations.map(
                       (registration) => (
                         <article
                           className="student-registration-card"
-                          key={
-                            registration._id
-                          }
+                          key={registration._id}
                         >
 
                           <div className="registration-card-top">
@@ -691,14 +765,10 @@ function StudentDashboard() {
                               "Team" &&
                               registration.teamName && (
                                 <div className="registration-team-info">
-                                  <span>
-                                    TEAM
-                                  </span>
+                                  <span>TEAM</span>
 
                                   <strong>
-                                    {
-                                      registration.teamName
-                                    }
+                                    {registration.teamName}
                                   </strong>
                                 </div>
                               )}
@@ -710,15 +780,12 @@ function StudentDashboard() {
                                 <span>◷</span>
 
                                 <p>
-                                  <small>
-                                    DATE
-                                  </small>
+                                  <small>DATE</small>
 
                                   <strong>
                                     {formatDate(
                                       registration
-                                        .event
-                                        ?.date
+                                        .event?.date
                                     )}
                                   </strong>
                                 </p>
@@ -729,9 +796,7 @@ function StudentDashboard() {
                                 <span>⌖</span>
 
                                 <p>
-                                  <small>
-                                    VENUE
-                                  </small>
+                                  <small>VENUE</small>
 
                                   <strong>
                                     {registration.event
@@ -789,6 +854,7 @@ function StudentDashboard() {
               <div className="dashboard-section">
 
                 <div className="section-heading">
+
                   <div>
                     <p>DISCOVER</p>
 
@@ -804,126 +870,154 @@ function StudentDashboard() {
                   >
                     View all →
                   </button>
+
                 </div>
 
 
-                {upcomingRegistrations.length >
-                0 ? (
-                  <div className="dashboard-upcoming-list">
+                {/* LOADING EVENTS */}
 
-                    {upcomingRegistrations
-                      .slice(0, 3)
-                      .map(
-                        (registration) => (
+                {eventsLoading && (
+                  <div className="empty-state">
+
+                    <div className="empty-icon">
+                      ◷
+                    </div>
+
+                    <h3>
+                      Loading upcoming events...
+                    </h3>
+
+                  </div>
+                )}
+
+
+                {/* EVENTS ERROR */}
+
+                {!eventsLoading &&
+                  eventsError && (
+                    <div className="empty-state">
+
+                      <div className="empty-icon">
+                        !
+                      </div>
+
+                      <h3>
+                        Unable to load events
+                      </h3>
+
+                      <p>
+                        {eventsError}
+                      </p>
+
+                      <button
+                        onClick={fetchEvents}
+                      >
+                        Try Again
+                      </button>
+
+                    </div>
+                  )}
+
+
+                {/* UPCOMING EVENTS */}
+
+                {!eventsLoading &&
+                  !eventsError &&
+                  upcomingEvents.length > 0 && (
+                    <div className="dashboard-upcoming-list">
+
+                      {upcomingEvents
+                        .slice(0, 3)
+                        .map((event) => (
                           <article
                             className="dashboard-upcoming-item"
-                            key={
-                              registration._id
-                            }
+                            key={event._id}
                           >
+
                             <div className="upcoming-date-box">
+
                               <strong>
-                                {new Date(
-                                  registration
-                                    .event
-                                    .date
-                                )
+                                {new Date(event.date)
                                   .getDate()
                                   .toString()
-                                  .padStart(
-                                    2,
-                                    "0"
-                                  )}
+                                  .padStart(2, "0")}
                               </strong>
 
                               <span>
-                                {new Date(
-                                  registration
-                                    .event
-                                    .date
-                                )
+                                {new Date(event.date)
                                   .toLocaleString(
                                     "en-US",
                                     {
-                                      month:
-                                        "short",
+                                      month: "short",
                                     }
                                   )
                                   .toUpperCase()}
                               </span>
+
                             </div>
 
 
                             <div className="upcoming-event-info">
+
                               <small>
-                                {registration
-                                  .event
-                                  .category ||
+                                {event.category ||
                                   "EVENT"}
                               </small>
 
                               <h3>
-                                {registration
-                                  .event
-                                  .title}
+                                {event.title}
                               </h3>
 
                               <p>
-                                {registration
-                                  .event
-                                  .time ||
-                                  "Time not specified"}{" "}
-                                •{" "}
-                                {registration
-                                  .event
-                                  .venue ||
+                                {event.time ||
+                                  "Time not specified"}
+                                {" • "}
+                                {event.venue ||
                                   "Venue not specified"}
                               </p>
+
                             </div>
 
 
                             <button
                               type="button"
                               onClick={() =>
-                                setSelectedRegistration(
-                                  registration
-                                )
+                                setActivePage("events")
                               }
                             >
                               →
                             </button>
+
                           </article>
-                        )
-                      )}
+                        ))}
 
-                  </div>
-                ) : (
-                  <div className="empty-state">
-                    <div className="empty-icon">
-                      ◫
                     </div>
+                  )}
 
-                    <h3>
-                      No upcoming registered
-                      events
-                    </h3>
 
-                    <p>
-                      Events you register for
-                      will appear here.
-                    </p>
+                {/* NO UPCOMING EVENTS */}
 
-                    <button
-                      onClick={() =>
-                        setActivePage(
-                          "events"
-                        )
-                      }
-                    >
-                      Explore Events
-                    </button>
-                  </div>
-                )}
+                {!eventsLoading &&
+                  !eventsError &&
+                  upcomingEvents.length === 0 && (
+                    <div className="empty-state">
+
+                      <div className="empty-icon">
+                        ◫
+                      </div>
+
+                      <h3>
+                        No upcoming events
+                      </h3>
+
+                      <p>
+                        New events created by the
+                        IT Department will appear
+                        here.
+                      </p>
+
+                    </div>
+                  )}
 
               </div>
 
@@ -966,8 +1060,7 @@ function StudentDashboard() {
                     </span>
 
                     <strong>
-                      {user?.department ||
-                        "—"}
+                      Information Technology
                     </strong>
                   </div>
 
@@ -1006,6 +1099,7 @@ function StudentDashboard() {
               </aside>
 
             </section>
+
           </div>
         )}
 
@@ -1031,8 +1125,6 @@ function StudentDashboard() {
           </div>
         )}
 
-
-        
 
         {/* =====================================
             PROFILE
@@ -1074,9 +1166,7 @@ function StudentDashboard() {
               <button
                 type="button"
                 onClick={() =>
-                  setSelectedRegistration(
-                    null
-                  )
+                  setSelectedRegistration(null)
                 }
               >
                 ×
@@ -1132,15 +1222,15 @@ function StudentDashboard() {
 
                 {selectedRegistration
                   .teamName && (
-                  <div>
-                    <span>Team Name</span>
+                    <div>
+                      <span>Team Name</span>
 
-                    <strong>
-                      {selectedRegistration
-                        .teamName}
-                    </strong>
-                  </div>
-                )}
+                      <strong>
+                        {selectedRegistration
+                          .teamName}
+                      </strong>
+                    </div>
+                  )}
 
 
                 <div>
@@ -1181,35 +1271,34 @@ function StudentDashboard() {
 
               {selectedRegistration
                 .projectTitle && (
-                <div className="dashboard-project-box">
+                  <div className="dashboard-project-box">
 
-                  <small>
-                    PROJECT / TOPIC
-                  </small>
+                    <small>
+                      PROJECT / TOPIC
+                    </small>
 
-                  <h3>
-                    {selectedRegistration
-                      .projectTitle}
-                  </h3>
-
-                  {selectedRegistration
-                    .projectDescription && (
-                    <p>
+                    <h3>
                       {selectedRegistration
-                        .projectDescription}
-                    </p>
-                  )}
+                        .projectTitle}
+                    </h3>
 
-                </div>
-              )}
+                    {selectedRegistration
+                      .projectDescription && (
+                        <p>
+                          {selectedRegistration
+                            .projectDescription}
+                        </p>
+                      )}
+
+                  </div>
+                )}
 
 
               {selectedRegistration
                 .registrationType ===
                 "Team" &&
                 selectedRegistration
-                  .teamMembers?.length >
-                  0 && (
+                  .teamMembers?.length > 0 && (
                   <div className="dashboard-team-list">
 
                     <div className="dashboard-team-list-heading">
@@ -1218,8 +1307,7 @@ function StudentDashboard() {
                       <span>
                         {
                           selectedRegistration
-                            .teamMembers
-                            .length
+                            .teamMembers.length
                         }{" "}
                         members
                       </span>
@@ -1228,37 +1316,34 @@ function StudentDashboard() {
 
                     {selectedRegistration
                       .teamMembers
-                      .map(
-                        (
-                          member,
-                          index
-                        ) => (
-                          <div
-                            className="dashboard-team-member"
-                            key={
-                              member._id ||
-                              index
-                            }
-                          >
-                            <span>
-                              {index + 1}
-                            </span>
+                      .map((member, index) => (
+                        <div
+                          className="dashboard-team-member"
+                          key={
+                            member._id ||
+                            index
+                          }
+                        >
+                          <span>
+                            {index + 1}
+                          </span>
 
-                            <div>
-                              <strong>
-                                {member.name}
-                              </strong>
+                          <div>
+                            <strong>
+                              {member.name}
+                            </strong>
 
-                              <small>
-                                {member.registerNumber}
-                                {member.department
-                                  ? ` • ${member.department}`
-                                  : ""}
-                              </small>
-                            </div>
+                            <small>
+                              {member.registerNumber}
+
+                              {member.department
+                                ? ` • ${member.department}`
+                                : ""}
+                            </small>
                           </div>
-                        )
-                      )}
+
+                        </div>
+                      ))}
 
                   </div>
                 )}
@@ -1268,9 +1353,7 @@ function StudentDashboard() {
                 type="button"
                 className="dashboard-modal-done-button"
                 onClick={() =>
-                  setSelectedRegistration(
-                    null
-                  )
+                  setSelectedRegistration(null)
                 }
               >
                 Done
@@ -1327,9 +1410,7 @@ function StudentDashboard() {
               : ""
           }
           onClick={() =>
-            setActivePage(
-              "certificates"
-            )
+            setActivePage("certificates")
           }
         >
           <span>◇</span>
