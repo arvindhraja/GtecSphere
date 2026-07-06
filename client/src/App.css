@@ -1244,7 +1244,7 @@ a {
 
 .department-identity {
   position: absolute;
-  top: 175px; /* moves the whole department block down */
+  top: 145px; /* moves the whole department block down */
 
   display: flex;
   flex-direction: column;
